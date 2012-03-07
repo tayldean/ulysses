@@ -14,8 +14,6 @@
 # 2 skaters: 3,2
 # 1 skater:  1
 # Championship Jr/Sr FS and Int. Dance: +2 to all places
-#
-# TODO: Ties?
 
 $filename = "corpus/2012_mit_results.html";
 
@@ -35,7 +33,7 @@ foreach (@lines){
         }
 	$_ =~ s/<.+  //;
 	$_ =~ s/<.+$//;
-        $event_name = $_;
+        $event_name = $_."\n";
 	$events_found++;
         $num_skaters = 0;
         undef @skater_array;
@@ -58,9 +56,9 @@ foreach (@lines){
         }
         push @skater_array, $skater_string;
     }
-# Now do the big print
+# Hash all the data
     if ($_ =~ m/<H3>Panel/){
-        print $event_name."\n";
+        $hash{$event_name} = '';
         if ($num_skaters >= 5){
             $points = 5 + $championship * 2;
         }
@@ -74,7 +72,7 @@ foreach (@lines){
             $points = 1 + $championship * 2;
         }
         foreach (@skater_array){
-            print "  ".$_.",$points\n";
+            $hash{$event_name} .= "  ".$_.",$points\n";
             if ($points > 0 + $championship*3){
                 $points--;
             }
@@ -83,6 +81,10 @@ foreach (@lines){
             }
         }
     }
+}
+
+foreach $event_name (sort keys %hash){
+    print $event_name,$hash{$event_name};
 }
 print "Found $events_found unique events\n";
 
