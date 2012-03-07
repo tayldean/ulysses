@@ -24,37 +24,67 @@ open FILE, "<", $filename or die "Unable to open $filename";
 $num_found = 0;
 @lines = <FILE>;
 foreach (@lines){
+    chomp($_);
     if ($_ =~ m/<TITLE>/){
 	$placement = 0;
+        if ($_ =~ m/Championship/){
+            $championship = 1;
+        }
+        else{
+            $championship = 0;
+        }
 	$_ =~ s/<.+  //;
 	$_ =~ s/<.+$//;
-	print $_;
-	$num_found++;
+        $event_name = $_;
+	$events_found++;
+        $num_skaters = 0;
+        undef @skater_array;
     }
     if ($_ =~ m/<TR><TD>.+1">/){
+        $num_skaters++;
 	$placement++;
+        $skater_string = "";
+        if ($_ =~ m/Withdrawn/){
+             $skater_string .= "W,";
+        }
+        else{
+            $skater_string .= $placement.",";
+        }
+        $_ =~ s/<.+1">//;
+        $_ =~ s/<.+$//;
+        $skater_string .= $_;
 	if ($_ =~ m/TIE/){
-	    $tie = 1;
-	}
-	else{
-	    $tie = 0;
-	}
-	if ($_ =~ m/Withdrawn/){
-	    $_ =~ s/<.+1">//;
-	    $_ =~ s/<.+$//;
-	    print "  W,$_";
-	}
-	else{
-	    $_ =~ s/<.+1">//;
-	    $_ =~ s/<.+$//;
-	    print "  $placement,$_";
-	}
-	if ($tie){
 	    $placement--;
-	}
+        }
+        push @skater_array, $skater_string;
+    }
+# Now do the big print
+    if ($_ =~ m/<H3>Panel/){
+        print $event_name."\n";
+        if ($num_skaters >= 5){
+            $points = 5 + $championship * 2;
+        }
+        elsif ($num_skaters >= 4){
+            $points = 4 + $championship * 2;
+        }
+        elsif ($num_skaters >= 2){
+            $points = 3 + $championship * 2;
+        }
+        else {
+            $points = 1 + $championship * 2;
+        }
+        foreach (@skater_array){
+            print "  ".$_.",$points\n";
+            if ($points > 0 + $championship*3){
+                $points--;
+            }
+            else{
+                $points = 0;
+            }
+        }
     }
 }
-print "Found $num_found unique events\n";
+print "Found $events_found unique events\n";
 
 close FILE;
 
