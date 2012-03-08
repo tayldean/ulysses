@@ -120,6 +120,7 @@ foreach $event_name (sort keys %event_hash){
         $points =~ s/^.+,//;
         $total_hash{$school} += $points;
         $event_hash_total{$event_name}{$school} += $points;
+        $starts_hash{$event_name}{$school} += 1;
     }
 }
 
@@ -145,5 +146,22 @@ foreach $event_name (sort keys %event_hash){
             }
         }
         print ",",$points;
+    }
+}
+
+print "\n";
+foreach $school_name (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
+    print ",",$school_name;
+}
+
+foreach $event_name (sort keys %event_hash){
+    print "\n",$event_name;
+    foreach $school_name (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
+        if ($event_hash_total{$event_name}{$school_name}){
+        print ",",$starts_hash{$event_name}{$school_name};
+        }
+        else{
+            print ",0";
+        }
     }
 }
