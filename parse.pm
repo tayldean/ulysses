@@ -2,15 +2,20 @@
 
 # Do withdrawls affect the number of points that are awarded?
 
-$filename = "out/2012_mit.out";
+#$filename = "corpus/2012_mit_results.txt";
+$filename = "corpus/2012_cornell_results.txt";
 
 open FILE, "<", $filename or die "Unable to open $filename";
 
 @lines = <FILE>;
 
 foreach (@lines){
+    # Ignore line
+    if ($_ =~ m/###/){
+    }
     # Line is a group
-    if ($_ =~ m/^[a-zA-Z]/){
+    elsif ($_ =~ m/^[a-zA-Z]/){
+        chomp($_);
         $event_name = $_;
     }
     # Line is a skater
@@ -100,7 +105,7 @@ foreach $event (sort keys %event_hash){
 }
 
 foreach $event_name (sort keys %event_hash){
-    print $event_name;
+    print $event_name."\n";
     foreach (@{$event_hash{$event_name}}){
         print $_."\n";
     }
@@ -113,9 +118,8 @@ foreach $event_name (sort keys %event_hash){
         $points = $school;
         $school =~ s/,.+//;
         $points =~ s/^.+,//;
-#        print $points." ";
-#        print $school."\n";
         $total_hash{$school} += $points;
+        $event_hash_total{$event_name}{$school} += $points;
     }
 }
 
@@ -126,3 +130,20 @@ foreach $school_name (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_has
 #foreach $school_name (sort keys %total_hash){
 #    print $school_name,",",$total_hash{$school_name},"\n";
 #}
+
+foreach $school_name (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
+    print ",",$school_name;
+}
+
+foreach $event_name (sort keys %event_hash){
+    print "\n",$event_name;
+    foreach $school_name (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
+        $points = 0;
+        foreach $skater_info (@{$event_hash{$event_name}}){
+            if ($skater_info =~ m/$school_name/){
+                $points = $event_hash_total{$event_name}{$school_name};
+            }
+        }
+        print ",",$points;
+    }
+}
