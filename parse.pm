@@ -1,5 +1,7 @@
 #!/usr/bin/perl
 
+# I need to reset variables between file processing steps
+
 #$filename = "corpus/2012_mit_results.txt";
 $filename = "corpus/2012_cornell_results.txt";
 $results_dir = "./results";
@@ -285,7 +287,7 @@ foreach (@files){
 #}
 
         print FILE_OUT "---------------------------------------- Team Starts by Event\n";
-        print FILE_OUT "School,Dance,Short,Free,Chapmionship,Team\n";
+        print FILE_OUT "School,Dance,Short,Free,Championship,Team\n";
         foreach $school (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
             if ($dance_starts{$school}){$a=",$dance_starts{$school}";}else{$a=",0";}
             if ($short_starts{$school}){$b=",$short_starts{$school}";}else{$b=",0";}
@@ -296,7 +298,7 @@ foreach (@files){
         }
 
         print FILE_OUT "---------------------------------------- Team Points by Event\n";
-        print FILE_OUT "School,Dance,Short,Free,Chapmionship,Team\n";
+        print FILE_OUT "School,Dance,Short,Free,Championship,Team\n";
         foreach $school (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
             if ($dance_points{$school}){$a=",$dance_points{$school}";}else{$a=",0";}
             if ($short_points{$school}){$b=",$short_points{$school}";}else{$b=",0";}
@@ -307,7 +309,7 @@ foreach (@files){
         }
 
         print FILE_OUT "---------------------------------------- Team Points/Start by Event\n";
-        print FILE_OUT "School,Dance,Short,Free,Chapmionship,Team\n";
+        print FILE_OUT "School,Dance,Short,Free,Championship,Team\n";
         foreach $school (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
             if ($dance_points{$school} && $dance_starts{$school}){
                 $a=sprintf(",%0.2f",$dance_points{$school}/$dance_starts{$school});}else{$a=",0";}
