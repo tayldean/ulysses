@@ -6,31 +6,40 @@
 $filename = "corpus/2012_cornell_results.txt";
 $results_dir = "./results";
 
+%level_hash = (
+    'Pre-Preliminary' => 1, 'Preliminary'   => 2, 'Pre-Juvenile' => 3, 'Juvenile' => 4,
+    'Intermediate'    => 5, 'Novice'        => 6, 'Junior'       => 7, 'Senior'   => 8,
+    'Low'             => 1, 'High'          => 8
+    );
+%level_hash_dance = (
+    'Preliminary'     => 1, 'Juvenile' => 2, 'Intermediate' => 3, 'Novice' => 4,
+    'Junior'          => 5, 'Senior'   => 6, 'Gold'         => 7, 'International' => 8
+    );
+$levels = "Pre-Preliminary|Preliminary|Pre-Juvenile|Juvenile|Intermediate|".
+    "Novice|Junior|Senior|Gold|International|Low|High";
+
 chdir $results_dir or die "Directory",$results_dir,"not found!";
 @files = sort(<*>);
 chdir $files[scalar(@files)-1] or die "Directory",$files[scalar(@files)-1],"not found";
 @files = sort(<*>);
 foreach (@files){
-    if ($_ =~ m/\.results$/){
+    if ($_ =~ m/([a-zA-Z ]+)\.results.test$/){
         print "  Processing ",$_,"\n";
         
-        $file_out = $_;
-        $file_out =~ s/\..+$/\.out/;
+        $file_out = "$1.out.test";
+        print $file_out."\n";
 
         open FILE_RESULTS, "<", $_ or die "Unable to open $_";
         open FILE_OUT, ">", $file_out or die "Unable to open $_";
 
-        @lines = <FILE_RESULTS>;
-
-        foreach (@lines){
+        while (<FILE_RESULTS>) {
             $_ =~ s///;
             # Ignore line
             if ($_ =~ m/[#]+/){
             }
             # Line is a group
-            elsif ($_ =~ m/^[a-zA-Z]/){
-                chomp($_);
-                $event_name = $_;
+            elsif ($_ =~ m/^([a-zA-Z].+)$/){
+                $event_name = $1;
             }
             # Line is a skater
             else{
@@ -39,14 +48,25 @@ foreach (@files){
         }
 
         foreach $event (sort keys %event_hash){
+            undef $level;
+            undef $gender;
+            undef $event_type;
+            undef $championship;
+            undef $flight;
+            $championship = 0;
+            if ($event =~ m/^($levels) (Ladies|Men|Girls|Boys)? ?(Dance|Free|Short|Team) ?(Championship)? ?([A-Z])?$/) {
+                $level = $1;
+                $gender = $2;
+                $event_type = $3;
+                $flight = $5;
+                if ($4 =~ m/Championship/ | $event =~ m/International/) {
+                    $championship = 1;
+                }
+            }
+            else {
+                die "Unexpected event format:\n $event";
+            }
             $num_skaters = 0;
-            # check for championship event
-            if ($event =~ m/Championship/ | $event =~ m/International/){
-                $championship = 1;
-            }
-            else{
-                $championship = 0;
-            }
             # compute number of skaters
             foreach (@{$event_hash{$event}}){
 # If the number of points awarded decreases as a result of a
@@ -87,8 +107,7 @@ foreach (@files){
                         for ($i = $skater_count - $tie_count; $i < $skater_count; $i++){
                             chomp(@{$event_hash{$event}}[$i]);
                             $points_total += $points;
-                            if (($points > 0 + $championship * 3) & 
-                                !()){
+                            if (($points > 0 + $championship * 3) & !()){
                                 $points --;
                             }
                             else {
@@ -98,25 +117,33 @@ foreach (@files){
                         $points_total /= $tie_count;
                         for ($i = $skater_count - $tie_count; $i < $skater_count; $i++){
                             @{$event_hash{$event}}[$i] .= ",$points_total";
-                            $school = @{$event_hash{$event}}[$i];
-                            chomp($school);
-                            $school =~ s/^[ ]+[0-9W]+,[a-zA-Z'\- ]+,//;
-                            $school =~ s/,[0-9]+$//;
-                            $skater = @{$event_hash{$event}}[$i];
-                            chomp($skater);
-                            $skater =~ s/^[ ]+[0-9W]+,//;
-                            $skater =~ s/,.+$//;
+                            if (@{$event_hash{$event}}[$i] =~ 
+                                m/^[ ]+([0-9W]+),([a-zA-Z'\- ]+),([a-zA-Z ]+),([0-9]+)$/) {
+                                $skater = $2;
+                                $school = $3;
+                            }
+                            else {
+                                die "Unexpected skater placement format:\n",
+                                @{$event_hash{$event}}[$i];
+                            }
                             $skater_start_hash{$skater} += 1;
                             $skater_school_hash{$skater} = $school;
-                            $level = $event;
-                            $level =~ s/^[a-zA-Z\- ]+-[ ]+//;
-                            $level =~ s/[a-zA-Z\- ]+$//;
-                            @{$level_starts{$school}}[$level] += 1;
+                            # compute a numerical analog for the level
+                            # using the level hash declared up top. If
+                            # this event is a dance, subtract 2 levels
+                            # as these have a built in offset of 2.
+                            if ($event_type =~ m/Dance/) {
+                                $level_num = $level_hash_dance{$level};
+                            }
+                            else {
+                                $level_num = $level_hash{$level};
+                            }
+                            @{$level_starts{$school}}[$level_num] += 1;
                             if (@{$event_hash{$event}}[$i] !~ m/[ ]+W/){
                                 $skater_point_hash{$skater} += $points_total;
                                 $skater_withdrawl_hash{$skater} += 0;
                                 $team_withdrawls{$school} += 0;
-                                @{$level_points{$school}}[$level] += $points_total;
+                                @{$level_points{$school}}[$level_num] += $points_total;
                                 if ($event =~ m/Dance/){
                                     $dance_points{$school} += $points_total;
                                 }
@@ -139,7 +166,7 @@ foreach (@files){
                                 $skater_point_hash{$skater} += 0;
                                 $skater_withdrawl_hash{$skater} += 1;
                                 $team_withdrawls{$school} += 1;
-                                @{$level_points{$school}}[$level] += 0;
+                                @{$level_points{$school}}[$level_num] += 0;
                             }
                             if ($event =~ m/Dance/){
                                 $dance_starts{$school} += 1;
@@ -178,30 +205,33 @@ foreach (@files){
             }
             $points_total /= $tie_count;
             for ($i = $skater_count - $tie_count; $i < $skater_count; $i++){
-                $skater = @{$event_hash{$event}}[$i];
-                chomp($skater);
-                $skater =~ s/^[ ]+[0-9W]+,//;
-                $skater =~ s/,.+$//;
-                $school = @{$event_hash{$event}}[$i];
-                chomp($school);
-                $school =~ s/^.+,//;
-                $level = $event;
-                $level =~ s/^[a-zA-Z\- ]+-[ ]+//;
-                $level =~ s/[a-zA-Z\- ]+$//;
-                @{$level_starts{$school}}[$level] += 1;
+                if (@{$event_hash{$event}}[$i] =~ m/^[ ]+([0-9W]+),([-a-zA-Z' ]+),([a-zA-Z ]+)$/) {
+                    $skater = $2;
+                    $school = $3;
+                }
+                else {
+                    die "Unexpected skater format:\n $skater";
+                }
+                if ($event_type =~ m/Dance/) {
+                    $level_num = $level_hash_dance{$level};
+                }
+                else {
+                    $level_num = $level_hash{$level};
+                }
+                @{$level_starts{$school}}[$level_num] += 1;
                 if (@{$event_hash{$event}}[$i] =~ m/[ ]+W/){
                     @{$event_hash{$event}}[$i] .= ",0";
                     $skater_point_hash{$skater} += 0;
                     $skater_withdrawl_hash{$skater} += 1;
                     $team_withdrawls{$school} += 1;
-                    @{$level_points{$school}}[$level] += 0;
+                    @{$level_points{$school}}[$level_num] += 0;
                 }
                 else{
                     @{$event_hash{$event}}[$i] .= ",$points_total";
                     $skater_point_hash{$skater} += $points_total;
                     $skater_withdrawl_hash{$skater} += 0;
                     $team_withdrawls{$school} += 0;
-                    @{$level_points{$school}}[$level] += $points_total;
+                    @{$level_points{$school}}[$level_num] += $points_total;
                     if ($event =~ m/Dance/){
                         $dance_points{$school} += $points_total;
                     }
@@ -252,12 +282,13 @@ foreach (@files){
 
         foreach $event_name (sort keys %event_hash){
             foreach (@{$event_hash{$event_name}}){
-                $school = $_;
-                $school =~ s/^[ ]+[0-9W]+,[a-zA-Z-'. ]+,//;
-                $school =~ s/,$//;
-                $points = $school;
-                $school =~ s/,.+//;
-                $points =~ s/^.+,//;
+                if ($_ =~ m/[ ]+([0-9W]+),([a-zA-Z-'. ]+),([a-zA-Z ]+),([0-9]+)$/) {
+                    $school = $3;
+                    $points = $4;
+                }
+                else {
+                    die "Unexpected format for skater:\n  $_";
+                }
                 $total_hash{$school} += $points;
                 $total_starts_hash{$school} += 1;
                 $event_hash_total{$event_name}{$school} += $points;
@@ -387,7 +418,7 @@ foreach (@files){
             }
         }
 
-        print FILE_OUT "\n";
+        print FILE_OUT "\n---------------------------------------- Event Starts\n";
         foreach $school_name (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
             print FILE_OUT ",",$school_name;
         }
@@ -411,5 +442,3 @@ foreach (@files){
     close FILE_RESULTS;
     close FILE_OUT;
 }
-
-
