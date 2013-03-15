@@ -23,10 +23,10 @@ chdir $results_dir or die "Directory",$results_dir,"not found!";
 chdir $files[scalar(@files)-1] or die "Directory",$files[scalar(@files)-1],"not found";
 @files = sort(<*>);
 foreach (@files){
-    if ($_ =~ m/([a-zA-Z ]+)\.results.test$/){
+    if ($_ =~ m/([a-zA-Z ]+)\.results$/){
         print "  Processing ",$_,"\n";
         
-        $file_out = "$1.out.test";
+        $file_out = "$1.out";
         print $file_out."\n";
 
         open FILE_RESULTS, "<", $_ or die "Unable to open $_";
