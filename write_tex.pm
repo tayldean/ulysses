@@ -38,14 +38,14 @@ my $tex = <<END;
 \\begin{document}
 
 \\title[$competition $year Results]{$competition $year Unofficial Team Standings}
-\\author[Schuyler Eldridge,
-  Boston University]{Schuyler Eldridge}
+%%\\author[Schuyler Eldridge,
+%%  Boston University]{Schuyler Eldridge}
 
 \\begin{frame}[t,fragile]{$competition $year Unofficial Team Standings}
   \\begin{table}
     \\centering
     \\setlength{\\tabcolsep}{1pt}
-    \\vspace{0pt}
+    \\vspace{-25pt}
     \\pgfplotstableset{
       every head row/.style={
         before row=\\toprule,

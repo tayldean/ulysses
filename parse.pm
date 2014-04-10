@@ -10,10 +10,14 @@ $results_dir = "./results";
     'Low'             => 1, 'High'          => 8
     );
 %level_abbrv = (
-    'Preliminary'  => 'Pre.', 'Juvenile'      => 'J.',
+    'Preliminary'  => 'Pre.', 'Juvenile'      => 'Juv.',
     'Intermediate' => 'Int.', 'Novice'        => 'Nov.',
     'Junior'       => 'Jun.', 'Senior'        => 'Sen.',
-    'Championship' => 'Ch.',  'International' => 'Intern.'
+    'Championship' => 'Ch.',  'International' => 'Intern.',
+    'Men'          => 'M.',   'Ladies'        => 'L.'
+    );
+%school_abbrv = (
+    'University' => 'U.', 'College' => 'C.'
     );
 %level_hash_dance = (
     'Preliminary'     => 1, 'Juvenile' => 2, 'Intermediate' => 3, 'Novice' => 4,
@@ -131,7 +135,7 @@ foreach $event (sort keys %event_hash){
                 for ($i = $skater_count - $tie_count; $i < $skater_count; $i++){
                     @{$event_hash{$event}}[$i] .= ",$points_total";
                     if (@{$event_hash{$event}}[$i] =~
-                        m/^[ ]+([0-9W]+),([a-zA-Z'\- ]+),([a-zA-Z ]+),([0-9]+)$/) {
+                        m/^[ ]+([0-9W]+),([a-zA-Z'\- ]+),([a-zA-Z ]+),([.0-9]+)$/) {
                         $skater = $2;
                         $school = $3;
                     }
@@ -295,7 +299,7 @@ foreach $event_name (sort keys %event_hash){
 
 foreach $event_name (sort keys %event_hash){
     foreach (@{$event_hash{$event_name}}){
-        if ($_ =~ m/[ ]+([0-9W]+),([a-zA-Z-'. ]+),([a-zA-Z ]+),([0-9]+)$/) {
+        if ($_ =~ m/[ ]+([0-9W]+),([a-zA-Z-'. ]+),([a-zA-Z ]+),([.0-9]+)$/) {
             $school = $3;
             $points = $4;
         }
@@ -441,9 +445,14 @@ foreach $event_name (sort keys %event_hash){
     }
     print FILE_DAT $event_name.",";
 }
-print FILE_DAT "Total\n";
+print FILE_DAT "Total,Starts\n";
 foreach $school_name (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
-    print FILE_DAT $school_name.",";
+    $school_instance_abbrv = $school_name;
+    foreach $school (sort keys %school_abbrv) {
+        $school_instance_abbrv =~ s/$school/$school_abbrv{$school}/;
+    }
+    # print FILE_DAT $school_name.",";
+    print FILE_DAT $school_instance_abbrv.",";
     foreach $event_name (sort keys %event_hash){
         $points = 0;
         foreach $skater_info (@{$event_hash{$event_name}}){
@@ -453,7 +462,7 @@ foreach $school_name (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_has
         }
         print FILE_DAT $points.",";
     }
-    print FILE_DAT $total_hash{$school_name}."\n";
+    print FILE_DAT $total_hash{$school_name}.",".$total_starts_hash{$school_name}."\n";
 }
 
 print FILE_OUT "\n---------------------------------------- Event Starts\n";
