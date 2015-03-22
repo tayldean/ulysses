@@ -15,7 +15,7 @@ my $file_dat = $file_tex;
 $file_dat =~ s/tex$/dat/;
 my $year;
 my $competition;
-if ($file_tex =~ /^results\/([0-9]+)_([a-z]+)\.tex/) {
+if ($file_tex =~ /^results\/([0-9]+)_([a-zA-Z]+)\.tex/) {
     $year = $1;
     $competition = ucfirst($2);
 }

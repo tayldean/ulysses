@@ -17,7 +17,11 @@ $results_dir = "./results";
     'Men'          => 'M.',   'Ladies'        => 'L.'
     );
 %school_abbrv = (
-    'University' => 'U.', 'College' => 'C.'
+    'California Berkeley' => 'Cal',
+    'California Los Angeles' => 'UCLA',
+    'University' => '',
+    'of ' => '',
+    'College' => ''
     );
 %level_hash_dance = (
     'Preliminary'     => 1, 'Juvenile' => 2, 'Intermediate' => 3, 'Novice' => 4,
@@ -317,9 +321,12 @@ print FILE_OUT "---------------------------------------- Skater Results\n";
 print FILE_OUT "Skater,School,Points,Starts,Withdrawls,Points/Start\n";
 foreach $school (sort {$skater_school_hash{$a} <=> $skater_school_hash{$b}} keys %skater_school_hash){
     foreach $skater (sort {$skater_point_hash{$b} <=> $skater_point_hash{$a}} keys %skater_point_hash){
-        if ($skater_school_hash{$skater} eq $school) {
+        if ($skater_school_hash{$skater} eq $skater_school_hash{$school}) {
             print FILE_OUT $skater,",",$skater_school_hash{$skater},",",$skater_point_hash{$skater},",",$skater_start_hash{$skater},",",$skater_withdrawl_hash{$skater},",",sprintf("%0.2f",$skater_point_hash{$skater}/$skater_start_hash{$skater}),"\n";
         }
+        # else {
+        #     print FILE_OUT $skater_school_hash{$skater}."->".$skater_school_hash{$school}."\n";
+        # }
     }
 }
 
