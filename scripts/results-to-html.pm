@@ -31,7 +31,6 @@ my $boilerplate_header = <<"END";
 <table border="1">
 END
 my $boilerplate_footer = <<"END";
-</table>
 </body>
 </html>
 END
@@ -74,6 +73,9 @@ while (<FILE_SCORES>) {
     }
     print FILE_HTML "</tr>\n";
 }
+
+my $timestamp = localtime();
+print FILE_HTML "</table>\nLast updated: $timestamp\n";
 
 print FILE_HTML $boilerplate_footer;
 close FILE_SCORES;

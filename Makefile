@@ -10,7 +10,14 @@ SCORES = $(addsuffix .scores,$(addprefix $(DIR_BUILD)/,\
 	$(basename $(notdir $(RESULTS)))))
 HTMLS = $(addsuffix .html,$(basename $(SCORES)))
 
+RESULT_NEWEST = $(shell find $(DIR_RESULTS) -regex ".+\.results" | \
+	sort | tail -n1)
+HTML_NEWEST = $(addsuffix .html,$(addprefix $(DIR_BUILD)/,\
+	$(notdir $(basename $(RESULT_NEWEST)))))
+
 .PRECIOUS: $(DIR_BUILD)/%.scores
+
+.PHONY: all clean publish
 
 vpath %.results $(DIR_RESULTS)
 
@@ -22,13 +29,14 @@ $(DIR_BUILD)/%.scores: %.results
 $(DIR_BUILD)/%.html: $(DIR_BUILD)/%.scores
 	$(GEN_HTML) $< $@
 
-publish:
-	find $(DIR_BUILD) -regex "$(DIR_BUILD)/[0-9].+\.html" | \
-	sort | tail -n1 | xargs cat > \
-	$(DIR_BUILD)/index.html
+publish: $(HTML_NEWEST)
+	cat $< > $(DIR_BUILD)/index.html
 	git checkout gh-pages
 	cp $(DIR_BUILD)/index.html .
-	git add index.html && git commit -m "Update index.html" && git push
+	git status | grep "Changes not staged for commit" 2>&1 > /dev/null
+	if [ $? -eq 0 ]; then
+		git add index.html && git commit -m "Update index.html" && git push
+	fi
 	git checkout master
 
 clean:
