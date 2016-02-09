@@ -4,6 +4,7 @@ DIR_SCRIPTS = scripts
 
 PARSE = $(DIR_SCRIPTS)/parse.pm
 GEN_HTML = $(DIR_SCRIPTS)/results-to-html.pm
+PUBLISH = $(DIR_SCRIPTS)/git-publish.sh
 
 RESULTS = $(shell ls $(DIR_RESULTS)/*.results)
 SCORES = $(addsuffix .scores,$(addprefix $(DIR_BUILD)/,\
@@ -29,14 +30,11 @@ $(DIR_BUILD)/%.scores: %.results
 $(DIR_BUILD)/%.html: $(DIR_BUILD)/%.scores
 	$(GEN_HTML) $< $@
 
+$(DIR_BUILD)/index.html: $(HTML_NEWEST)
+	cat $< > $@
+
 publish: $(HTML_NEWEST)
-	cat $< > $(DIR_BUILD)/index.html
-	git checkout gh-pages
-	cp $(DIR_BUILD)/index.html .
-	if [ `git add index.html && git commit -m "Update index.html" && git push` -eq 0 ]; then
-		git add index.html && git commit -m "Update index.html" && git push
-	fi
-	git checkout master
+	$(PUBLISH) $<
 
 clean:
 	rm -rf $(DIR_BUILD)/*
