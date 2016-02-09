@@ -23,7 +23,8 @@ $(DIR_BUILD)/%.html: $(DIR_BUILD)/%.scores
 	$(GEN_HTML) $< $@
 
 publish:
-	find $(DIR_BUILD) -regex ".+\.html" | sort | tail -n1 | xargs cat > \
+	find $(DIR_BUILD) -regex "$(DIR_BUILD)/[0-9].+\.html" | \
+	sort | tail -n1 | xargs cat > \
 	$(DIR_BUILD)/index.html
 	git checkout gh-pages
 	cp $(DIR_BUILD)/index.html .
