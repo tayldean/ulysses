@@ -41,8 +41,7 @@ else {
 $file_results = $ARGV[0];
 print "Processing $file_results\n";
 
-$file_out = $file_results;
-$file_out =~ s/results$/scores/;
+$file_out = $ARGV[1];
 $file_dat = $file_results;
 $file_dat =~ s/results$/dat/;
 $file_tex = $file_results;

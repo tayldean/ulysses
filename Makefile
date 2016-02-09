@@ -5,21 +5,21 @@ COMPETITIONS = $(patsubst %.results,%.out,$(wildcard results/*.results))
 PDFS = $(patsubst %.results,%.pdf,$(wildcard results/*.results))
 TEXS = $(patsubst %.results,%.tex,$(wildcard results/*.results))
 DATS = $(patsubst %.results,%.dat,$(wildcard results/*.results))
+SCORES = $(patsubst %.results,%.scores,$(wildcard results/*.results))
 
 .SUFFIXES: .results .out .pdf
 
 .PRECIOUS: $(TEXS) $(DATS)
 
+vpath %.scores $(DIR_RESULTS)
+
 all: $(DATS)
 
-%.dat: %.results
-	./parse.pm $<
+%.scores: %.resutls
+	./parse.pm $< $@
 
-%.tex: %.dat
-	./write_tex.pm $@
-
-%.pdf: %.tex
-	pdflatex -output-directory $(DIR_RESULTS) $<
+$(DIR_BUILD)/%.html: %.scores
+	./results-to-html.pm $< $@
 
 publish:
 	find $(DIR_RESULTS) -regex ".+\.scores" | sort | tail -n1 | xargs cat > \
