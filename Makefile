@@ -1,24 +1,18 @@
 DIR_RESULTS = results
 DIR_BUILD   = build
 
-COMPETITIONS = $(patsubst %.results,%.out,$(wildcard results/*.results))
-PDFS = $(patsubst %.results,%.pdf,$(wildcard results/*.results))
-TEXS = $(patsubst %.results,%.tex,$(wildcard results/*.results))
-DATS = $(patsubst %.results,%.dat,$(wildcard results/*.results))
-SCORES = $(patsubst %.results,%.scores,$(wildcard results/*.results))
+RESULTS = $(shell ls $(DIR_RESULTS)/*.results)
+SCORES = $(addsuffix .scores,$(addprefix $(DIR_BUILD)/,\
+	$(basename $(notdir $(RESULTS)))))
 
-.SUFFIXES: .results .out .pdf
+vpath %.results $(DIR_RESULTS)
 
-.PRECIOUS: $(TEXS) $(DATS)
+all: $(SCORES)
 
-vpath %.scores $(DIR_RESULTS)
-
-all: $(DATS)
-
-%.scores: %.resutls
+$(DIR_BUILD)/%.scores: %.results
 	./parse.pm $< $@
 
-$(DIR_BUILD)/%.html: %.scores
+$(DIR_BUILD)/%.html: $(DIR_BUILD)/%.scores
 	./results-to-html.pm $< $@
 
 publish:

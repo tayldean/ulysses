@@ -31,11 +31,11 @@ $levels = "Pre-Preliminary|Preliminary|Pre-Juvenile|Juvenile|Intermediate|".
     "Novice|Junior|Senior|Gold|International|Low|High";
 
 
-if ($#ARGV+1 == 1) {
+if ($#ARGV+1 == 2) {
     print $ARGV[0],"\n";
 }
 else {
-    die "Expected 1 inputs to parse.pm, found ",$#ARGV+1;
+    die "Expected 2 inputs to parse.pm, found ",$#ARGV+1;
 }
 
 $file_results = $ARGV[0];
