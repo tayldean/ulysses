@@ -1,12 +1,16 @@
 #!/bin/bash
 
-file=$1
+file=$0
 
 git checkout gh-pages
 cp $file .
-git add $file
+git status | grep $file 2>&1 > /dev/null
 if [ $? -eq 0 ]; then
-    git commit -m "Update index.html"
-    git push
+    echo "[INFO] Commiting and publishing to GitHub"
+    # git add $file
+    # git commit -m "Update index.html"
+    # git push
+else
+    echo "[INFO] No changes detected, not publishing"
 fi
 git checkout master

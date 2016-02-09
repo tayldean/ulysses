@@ -33,7 +33,7 @@ $(DIR_BUILD)/%.html: $(DIR_BUILD)/%.scores
 $(DIR_BUILD)/index.html: $(HTML_NEWEST)
 	cat $< > $@
 
-publish: $(HTML_NEWEST)
+publish: $(DIR_BUILD)/index.html
 	$(PUBLISH) $<
 
 clean:
