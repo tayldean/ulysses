@@ -10,6 +10,8 @@ SCORES = $(addsuffix .scores,$(addprefix $(DIR_BUILD)/,\
 	$(basename $(notdir $(RESULTS)))))
 HTMLS = $(addsuffix .html,$(basename $(SCORES)))
 
+.PRECIOUS: $(DIR_BUILD)/%.scores
+
 vpath %.results $(DIR_RESULTS)
 
 all: $(HTMLS)
