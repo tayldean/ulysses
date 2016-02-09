@@ -7,7 +7,7 @@ DATS = $(patsubst %.results,%.dat,$(wildcard results/*.results))
 
 .PRECIOUS: $(TEXS) $(DATS)
 
-all: $(PDFS)
+all: $(DATS)
 
 %.dat: %.results
 	./parse.pm $<
