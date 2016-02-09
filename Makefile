@@ -33,8 +33,7 @@ publish: $(HTML_NEWEST)
 	cat $< > $(DIR_BUILD)/index.html
 	git checkout gh-pages
 	cp $(DIR_BUILD)/index.html .
-	git status | grep "Changes not staged for commit" 2>&1 > /dev/null
-	if [ $? -eq 0 ]; then
+	if [ `git add index.html && git commit -m "Update index.html" && git push` -eq 0 ]; then
 		git add index.html && git commit -m "Update index.html" && git push
 	fi
 	git checkout master
