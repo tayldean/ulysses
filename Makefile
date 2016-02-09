@@ -1,5 +1,9 @@
 DIR_RESULTS = results
 DIR_BUILD   = build
+DIR_SCRIPTS = scripts
+
+PARSE = $(DIR_SCRIPTS)/parse.pm
+GEN_HTML = $(DIR_SCRIPTS)/results-to-html.pm
 
 RESULTS = $(shell ls $(DIR_RESULTS)/*.results)
 SCORES = $(addsuffix .scores,$(addprefix $(DIR_BUILD)/,\
@@ -11,10 +15,10 @@ vpath %.results $(DIR_RESULTS)
 all: $(HTMLS)
 
 $(DIR_BUILD)/%.scores: %.results
-	./parse.pm $< $@
+	$(PARSE) $< $@
 
 $(DIR_BUILD)/%.html: $(DIR_BUILD)/%.scores
-	./results-to-html.pm $< $@
+	$(GEN_HTML) $< $@
 
 publish:
 	find $(DIR_BUILD) -regex ".+\.html" | sort | tail -n1 | xargs cat > \
