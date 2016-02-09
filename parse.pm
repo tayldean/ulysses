@@ -42,15 +42,15 @@ $file_results = $ARGV[0];
 print "Processing $file_results\n";
 
 $file_out = $ARGV[1];
-$file_dat = $file_results;
-$file_dat =~ s/results$/dat/;
+# $file_dat = $file_results;
+# $file_dat =~ s/results$/dat/;
 $file_tex = $file_results;
 $file_tex = s/^results/latex/;
 $file_tex = s/results$/tex/;
 
 open FILE_RESULTS, "<", $file_results or die "Unable to open <$file_results";
 open FILE_OUT, ">", $file_out or die "Unable to open >$file_out";
-open FILE_DAT, ">", $file_dat or die "Unable to open >$file_dat";
+# open FILE_DAT, ">", $file_dat or die "Unable to open >$file_dat";
 
 while (<FILE_RESULTS>) {
     $_ =~ s///;
@@ -491,7 +491,7 @@ foreach $school (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
 
 close FILE_RESULTS;
 close FILE_OUT;
-close FILE_DAT;
+# close FILE_DAT;
 
 
 print "Done processing $file_out\n";

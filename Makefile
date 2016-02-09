@@ -17,12 +17,11 @@ $(DIR_BUILD)/%.html: $(DIR_BUILD)/%.scores
 
 publish:
 	find $(DIR_RESULTS) -regex ".+\.scores" | sort | tail -n1 | xargs cat > \
-	$(DIR_RESULTS)/index.html
+	$(DIR_BUILD)/index.html
 	git checkout gh-pages
-	cp $(DIR_RESULTS)/index.html .
+	cp $(DIR_BUILD)/index.html .
 	git add index.html && git commit -m "Update index.html" && git push
 	git checkout master
 
 clean:
-	cd $(DIR_RESULTS) && \
-	rm -f *.log *.aux *.pdf *.toc *.snm *.vrb *.scores *.tex *.swp *.dat *~
+	rm -rf $(DIR_BUILD)/*
