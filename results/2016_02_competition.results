@@ -1,0 +1,50 @@
+# Format:
+# v-- THIS is the first character which should be fully left aligned
+# [Level] [Ladies|Men] [Event] [Championship]? [Flight]?
+#   1,[Name of skater placing first],[School]
+#   2,[Name of skater placing second],[School]
+#   ...
+#   [Last place],[Name of skater placing last],[School]
+#   W,[Name of withdrawn skater],[School]
+#   W,[Name of withdrawn skater],[School]
+# [Level] [Ladies|Men] [Event] [Championship]? [Flight]?
+# ...
+Preliminary Dance A
+  1, Martine Szanto, Sacred Heart
+  2, Katherine Bates, Dartmouth
+  3, Clara Sherman, UD
+  4, Castella Copeland, UConn
+  5, Kathaine Huntley-bachers, BU
+  6, Kristen LaHaise, Sacred Heart
+  7, Morgan Minto, ECU
+  8, Sarah Lupton, Towson
+Intermediate Ladies Short
+  1, Briana Cass, BU
+  2, Sara Bittner, Towson
+  3, Kirsten LaHaise, Sacred Heart
+  4, Brittney Severino, Sacred Heart
+  5, Alexis Finks, ECU
+  6, Leah Conti, Penn State
+  7, Ellie Thomas, ECU
+  8, Sally Warren, ECU
+  9, Emily Hautbois, Liberty
+  10, Shelby Locklear, Liberty
+  W, Clara Sherman, UD
+Senior Ladies Free Championship
+  1, Courtney Taylor, UD
+  2, Sarah Yasenka, BU
+  3, Kirsten Seagers, Dartmouth
+  4, Kjerstyn Hall, BU
+  5, Taylor McDonough, Sacred Heart
+  6, Helen Serafini, Sacred Heart
+  7, Jessie Anderson, Dartmouth
+  8, Alyssa Uzumcu, BU
+Intermediate Team
+  1, Liberty, Liberty
+  2, BU, BU
+  2, Towson, Towson
+  4, ECU, ECU
+  5, UVA, UVA
+  6, UConn, UConn
+  7, Sacred Heart, Sacred Heart
+  W, Penn State, Penn State
