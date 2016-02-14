@@ -389,7 +389,12 @@ $string_out .= "---------------------------------------- Team Points & Starts\n"
 $string_out .= "School,Points,Starts,Withdrawls,Points/Start\n";
 # print FILE_DAT "School Points Starts Withdrawls Points_Start\n";
 foreach $school (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
-    $string_out .= $school,",",$total_hash{$school},",",$total_starts_hash{$school},",",$team_withdrawls{$school},",",sprintf("%0.2f",$total_hash{$school}/$total_starts_hash{$school}),"\n";
+    $string_out .= "$school,$total_hash{$school},$total_starts_hash{$school},";
+    $string_out .= "$team_withdrawls{$school},";
+    $string_out .= sprintf("%0.2f",$total_hash{$school}/$total_starts_hash{$school});
+    $string_out .= "\n";
+    # $string_out .= $school,",",$total_hash{$school},",",$total_starts_hash{$school},",",sprintf("%0.2f",$total_hash{$school}/$total_starts_hash{$school}),"\n";
+    # $string_out .= $school,",",$total_hash{$school},",",$total_starts_hash{$school},",",$team_withdrawls{$school},",",sprintf("%0.2f",$total_hash{$school}/$total_starts_hash{$school}),"\n";
     print "    ",$school,",",$total_hash{$school},",",$total_starts_hash{$school},",",sprintf("%0.2f",$total_hash{$school}/$total_starts_hash{$school}),"\n";
    # print FILE_DAT $school," ",$total_hash{$school}," ",$total_starts_hash{$school}," ",$team_withdrawls{$school}," ",sprintf("%0.2f",$total_hash{$school}/$total_starts_hash{$school}),"\n";
 }
