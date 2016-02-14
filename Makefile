@@ -13,8 +13,10 @@ HTMLS = $(addsuffix .html,$(basename $(SCORES)))
 
 RESULT_NEWEST = $(shell find $(DIR_RESULTS) -regex ".+\.results" | \
 	sort | tail -n1)
+SCORE_NEWEST = $(addsuffix .scores,$(addprefix $(DIR_BUILD)/,\
+	$(basename $(notdir $(RESULT_NEWEST)))))
 HTML_NEWEST = $(addsuffix .html,$(addprefix $(DIR_BUILD)/,\
-	$(notdir $(basename $(RESULT_NEWEST)))))
+	$(notdir $(basename $(SCORE_NEWEST)))))
 
 .PRECIOUS: $(DIR_BUILD)/%.scores
 
@@ -32,6 +34,7 @@ $(DIR_BUILD)/%.html: $(DIR_BUILD)/%.scores
 
 $(DIR_BUILD)/index.html: $(HTML_NEWEST)
 	cat $< > $@
+	echo $<
 
 publish: $(DIR_BUILD)/index.html
 	$(PUBLISH) $<
