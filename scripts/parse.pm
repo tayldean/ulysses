@@ -2,6 +2,53 @@
 
 # I need to reset variables between file processing steps
 
+sub usage_event_format() {
+    my $usage_event_string = <<'END';
+Event format should look exactly like the following (no leading space):
+
+[Level] [Gender] [Event] [Championship]? [Flight]?
+
+  Level may be one of:
+    Pre-Preliminary    Preliminary    Pre-Juvenile    Juvenile
+    Intermediate       Novice         Junior          Senior
+    High               Low
+  Gender may be one of and is not used for team events:
+    Men                Women          Girls           Boys
+  Event may be one of:
+    Short              Free           Dance           Team
+  Championship is an optional identifier
+  Flight is an optional, single uppercase letter from A-Z
+
+The following are examples of valid events:
+
+Preliminary Dance B
+Junior Ladies Free Championship
+High Team
+
+END
+    print $usage_event_string;
+};
+
+sub usage_skater_format() {
+    my $usage_skater_string = <<'END';
+Skater format should look exactly like the following (two leading
+spaces and separated by commas):
+
+  [Numerical Placement], [Skater Name], [School]
+
+  Numerical Placement is a number or a W. Ties are indicated by giving
+  two skaters the same placement.
+
+  Skater Name can be any number of letters and can include "'" and
+  "-".
+
+  School can be any number of letters and contain spaces (no special
+  characters). School name must be the same for all results.
+
+END
+    print $usage_skater_string;
+};
+
 $results_dir = "./results";
 
 %level_hash = (
@@ -50,8 +97,6 @@ $file_tex = s/results$/tex/;
 
 open FILE_RESULTS, "<", $file_results or
     die "[ERROR] Unable to open <$file_results";
-open FILE_OUT, ">", $file_out or
-    die "[ERROR] Unable to open >$file_out";
 # open FILE_DAT, ">", $file_dat or die "Unable to open >$file_dat";
 
 while (<FILE_RESULTS>) {
@@ -86,7 +131,9 @@ foreach $event (sort keys %event_hash){
         }
     }
     else {
-        die "[ERROR] Unexpected event format:\n $event";
+        print "\n[ERROR] Unexpected event format:\n\"$event\"\n";
+        usage_event_format and
+            die "Event processing failed to match known template\n  ";
     }
     $num_skaters = 0;
     # compute number of skaters
@@ -145,8 +192,10 @@ foreach $event (sort keys %event_hash){
                         $school = $3;
                     }
                     else {
-                        die "[ERROR] Unexpected skater placement format:\n",
-                        @{$event_hash{$event}}[$i];
+                        print "\n[ERROR] Unexpected skater format:\n";
+                        print "\"@{$event_hash{$event}}[$i]\"\n";
+                        usage_skater_format and
+                            die "Skater placement failed to match template\n  ";
                     }
                     $skater_start_hash{$skater} += 1;
                     $skater_school_hash{$skater} = $school;
@@ -232,8 +281,10 @@ foreach $event (sort keys %event_hash){
             $school = $3;
         }
         else {
-            die "[ERROR] Unexpected skater placement format:\n",
-            @{$event_hash{$event}}[$i];
+            print "\n[ERROR] Unexpected skater format:\n";
+            print "\"@{$event_hash{$event}}[$i]\"\n";
+            usage_skater_format and
+                die "Skater placement failed to match template\n  ";
         }
         if ($event_type =~ m/Dance/) {
             $level_num = $level_hash_dance{$level};
@@ -295,11 +346,11 @@ foreach $event (sort keys %event_hash){
     }
 }
 
-print FILE_OUT "---------------------------------------- Event Results\n";
+my $string_out = "---------------------------------------- Event Results\n";
 foreach $event_name (sort keys %event_hash){
-    print FILE_OUT $event_name."\n";
+    $string_out .= $event_name."\n";
     foreach (@{$event_hash{$event_name}}){
-        print FILE_OUT $_."\n";
+        $string_out .= $_."\n";
     }
 }
 
@@ -310,7 +361,9 @@ foreach $event_name (sort keys %event_hash){
             $points = $4;
         }
         else {
-            die "[ERROR] Unexpected format for skater:\n  $_";
+            print "\n[ERROR] Unexpected skater format:\n\"$_\"\n";
+            usage_skater_format and
+                die "Skater placement failed to match template\n  ";
         }
         $total_hash{$school} += $points;
         $total_starts_hash{$school} += 1;
@@ -319,24 +372,24 @@ foreach $event_name (sort keys %event_hash){
     }
 }
 
-# print FILE_OUT "---------------------------------------- Skater Results\n";
-# print FILE_OUT "Skater,School,Points,Starts,Withdrawls,Points/Start\n";
+# $string_out .= "---------------------------------------- Skater Results\n";
+# $string_out .= "Skater,School,Points,Starts,Withdrawls,Points/Start\n";
 # foreach $school (sort {$skater_school_hash{$a} <=> $skater_school_hash{$b}} keys %skater_school_hash){
 #     foreach $skater (sort {$skater_point_hash{$b} <=> $skater_point_hash{$a}} keys %skater_point_hash){
 #         if ($skater_school_hash{$skater} eq $skater_school_hash{$school}) {
-#             print FILE_OUT $skater,",",$skater_school_hash{$skater},",",$skater_point_hash{$skater},",",$skater_start_hash{$skater},",",$skater_withdrawl_hash{$skater},",",sprintf("%0.2f",$skater_point_hash{$skater}/$skater_start_hash{$skater}),"\n";
+#             $string_out .= $skater,",",$skater_school_hash{$skater},",",$skater_point_hash{$skater},",",$skater_start_hash{$skater},",",$skater_withdrawl_hash{$skater},",",sprintf("%0.2f",$skater_point_hash{$skater}/$skater_start_hash{$skater}),"\n";
 #         }
 #         # else {
-#         #     print FILE_OUT $skater_school_hash{$skater}."->".$skater_school_hash{$school}."\n";
+#         #     $string_out .= $skater_school_hash{$skater}."->".$skater_school_hash{$school}."\n";
 #         # }
 #     }
 # }
 
-print FILE_OUT "---------------------------------------- Team Points & Starts\n";
-print FILE_OUT "School,Points,Starts,Withdrawls,Points/Start\n";
+$string_out .= "---------------------------------------- Team Points & Starts\n";
+$string_out .= "School,Points,Starts,Withdrawls,Points/Start\n";
 # print FILE_DAT "School Points Starts Withdrawls Points_Start\n";
 foreach $school (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
-    print FILE_OUT $school,",",$total_hash{$school},",",$total_starts_hash{$school},",",$team_withdrawls{$school},",",sprintf("%0.2f",$total_hash{$school}/$total_starts_hash{$school}),"\n";
+    $string_out .= $school,",",$total_hash{$school},",",$total_starts_hash{$school},",",$team_withdrawls{$school},",",sprintf("%0.2f",$total_hash{$school}/$total_starts_hash{$school}),"\n";
     print "    ",$school,",",$total_hash{$school},",",$total_starts_hash{$school},",",sprintf("%0.2f",$total_hash{$school}/$total_starts_hash{$school}),"\n";
    # print FILE_DAT $school," ",$total_hash{$school}," ",$total_starts_hash{$school}," ",$team_withdrawls{$school}," ",sprintf("%0.2f",$total_hash{$school}/$total_starts_hash{$school}),"\n";
 }
@@ -345,30 +398,30 @@ foreach $school (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
 #    print $school_name,",",$total_hash{$school_name},"\n";
 #}
 
-# print FILE_OUT "---------------------------------------- Team Starts by Event\n";
-# print FILE_OUT "School,Dance,Short,Free,Championship,Team\n";
+# $string_out .= "---------------------------------------- Team Starts by Event\n";
+# $string_out .= "School,Dance,Short,Free,Championship,Team\n";
 # foreach $school (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
 #     if ($dance_starts{$school}){$a=",$dance_starts{$school}";}else{$a=",0";}
 #     if ($short_starts{$school}){$b=",$short_starts{$school}";}else{$b=",0";}
 #     if ($free_starts{$school}){$c=",$free_starts{$school}";}else{$c=",0";}
 #     if ($championship_starts{$school}){$d=",$championship_starts{$school}";}else{$d=",0";}
 #     if ($team_starts{$school}){$e=",$team_starts{$school}";}else{$e=",0";}
-#     print FILE_OUT $school,$a,$b,$c,$d,$e,"\n";
+#     $string_out .= $school,$a,$b,$c,$d,$e,"\n";
 # }
 
-# print FILE_OUT "---------------------------------------- Team Points by Event\n";
-# print FILE_OUT "School,Dance,Short,Free,Championship,Team\n";
+# $string_out .= "---------------------------------------- Team Points by Event\n";
+# $string_out .= "School,Dance,Short,Free,Championship,Team\n";
 # foreach $school (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
 #     if ($dance_points{$school}){$a=",$dance_points{$school}";}else{$a=",0";}
 #     if ($short_points{$school}){$b=",$short_points{$school}";}else{$b=",0";}
 #     if ($free_points{$school}){$c=",$free_points{$school}";}else{$c=",0";}
 #     if ($championship_points{$school}){$d=",$championship_points{$school}";}else{$d=",0";}
 #     if ($team_points{$school}){$e=",$team_points{$school}";}else{$e=",0";}
-#     print FILE_OUT $school,$a,$b,$c,$d,$e,"\n";
+#     $string_out .= $school,$a,$b,$c,$d,$e,"\n";
 # }
 
-# print FILE_OUT "---------------------------------------- Team Points/Start by Event\n";
-# print FILE_OUT "School,Dance,Short,Free,Championship,Team\n";
+# $string_out .= "---------------------------------------- Team Points/Start by Event\n";
+# $string_out .= "School,Dance,Short,Free,Championship,Team\n";
 # foreach $school (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
 #     if ($dance_points{$school} && $dance_starts{$school}){
 #         $a=sprintf(",%0.2f",$dance_points{$school}/$dance_starts{$school});}else{$a=",0";}
@@ -380,61 +433,61 @@ foreach $school (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
 #         $d=sprintf(",%0.2f",$championship_points{$school}/$championship_starts{$school});}else{$d=",0";}
 #     if ($team_points{$school} && $team_starts{$school}){
 #         $e=sprintf(",%0.2f",$team_points{$school}/$team_starts{$school});}else{$e=",0";}
-#     print FILE_OUT $school,$a,$b,$c,$d,$e,"\n";
+#     $string_out .= $school,$a,$b,$c,$d,$e,"\n";
 # }
 
-# print FILE_OUT "---------------------------------------- Team Starts by Level\n";
-# print FILE_OUT "School,Lv1,Lv2,Lv3,Lv4,Lv5,Lv6,Lv7,Lv8\n";
+# $string_out .= "---------------------------------------- Team Starts by Level\n";
+# $string_out .= "School,Lv1,Lv2,Lv3,Lv4,Lv5,Lv6,Lv7,Lv8\n";
 # foreach $school (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
-#     print FILE_OUT $school;
+#     $string_out .= $school;
 #     for ($level = 1; $level < 9; $level ++){
 #         if (@{$level_starts{$school}}[$level]){
-#             print FILE_OUT ",",@{$level_starts{$school}}[$level];
+#             $string_out .= ",",@{$level_starts{$school}}[$level];
 #         }
 #         else{
-#             print FILE_OUT ",0";
+#             $string_out .= ",0";
 #         }
 #     }
-#     print FILE_OUT "\n";
+#     $string_out .= "\n";
 # }
 
-# print FILE_OUT "---------------------------------------- Team Points by Level\n";
-# print FILE_OUT "School,Lv1,Lv2,Lv3,Lv4,Lv5,Lv6,Lv7,Lv8\n";
+# $string_out .= "---------------------------------------- Team Points by Level\n";
+# $string_out .= "School,Lv1,Lv2,Lv3,Lv4,Lv5,Lv6,Lv7,Lv8\n";
 # foreach $school (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
-#     print FILE_OUT $school;
+#     $string_out .= $school;
 #     for ($level = 1; $level < 9; $level ++){
 #         if (@{$level_points{$school}}[$level]){
-#             print FILE_OUT ",",@{$level_points{$school}}[$level];
+#             $string_out .= ",",@{$level_points{$school}}[$level];
 #         }
 #         else{
-#             print FILE_OUT ",0";
+#             $string_out .= ",0";
 #         }
 #     }
-#     print FILE_OUT "\n";
+#     $string_out .= "\n";
 # }
 
-# print FILE_OUT "---------------------------------------- Team Points/Start by Level\n";
-# print FILE_OUT "School,Lv1,Lv2,Lv3,Lv4,Lv5,Lv6,Lv7,Lv8\n";
+# $string_out .= "---------------------------------------- Team Points/Start by Level\n";
+# $string_out .= "School,Lv1,Lv2,Lv3,Lv4,Lv5,Lv6,Lv7,Lv8\n";
 # foreach $school (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
-#     print FILE_OUT $school;
+#     $string_out .= $school;
 #     for ($level = 1;$level < 9;$level++){
 #         if (@{$level_starts{$school}}[$level]){
-#             print FILE_OUT sprintf(",%0.2f",@{$level_points{$school}}[$level]/@{$level_starts{$school}}[$level]);
+#             $string_out .= sprintf(",%0.2f",@{$level_points{$school}}[$level]/@{$level_starts{$school}}[$level]);
 #         }
 #         else {
-#             print FILE_OUT ",0.00";
+#             $string_out .= ",0.00";
 #         }
 #     }
-#     print FILE_OUT "\n";
+#     $string_out .= "\n";
 # }
 
-# print FILE_OUT "---------------------------------------- Event Points\n";
+# $string_out .= "---------------------------------------- Event Points\n";
 # foreach $school_name (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
-#     print FILE_OUT ",",$school_name;
+#     $string_out .= ",",$school_name;
 # }
 
 # foreach $event_name (sort keys %event_hash){
-#     print FILE_OUT "\n",$event_name;
+#     $string_out .= "\n",$event_name;
 #     foreach $school_name (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
 #         $points = 0;
 #         foreach $skater_info (@{$event_hash{$event_name}}){
@@ -442,7 +495,7 @@ foreach $school (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
 #                 $points = $event_hash_total{$event_name}{$school_name};
 #             }
 #         }
-#         print FILE_OUT ",",$points;
+#         $string_out .= ",",$points;
 #     }
 # }
 
@@ -474,27 +527,31 @@ foreach $school (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
 #     print FILE_DAT $total_hash{$school_name}.",".$total_starts_hash{$school_name}."\n";
 # }
 
-# print FILE_OUT "\n---------------------------------------- Event Starts\n";
+# $string_out .= "\n---------------------------------------- Event Starts\n";
 # foreach $school_name (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
-#     print FILE_OUT ",",$school_name;
+#     $string_out .= ",",$school_name;
 # }
 
 # foreach $event_name (sort keys %event_hash){
-#     print FILE_OUT "\n",$event_name;
+#     $string_out .= "\n",$event_name;
 #     foreach $school_name (sort {$total_hash{$b} <=> $total_hash{$a}} keys %total_hash){
 # #                print $school_name,": ",$starts_hash{$event_name}{$school_name},"\n";
 #         if ($starts_hash{$event_name}{$school_name}!=0){
-#             print FILE_OUT ",",$starts_hash{$event_name}{$school_name};
+#             $string_out .= ",",$starts_hash{$event_name}{$school_name};
 #         }
 #         else{
-#             print FILE_OUT ",0";
+#             $string_out .= ",0";
 #         }
 #     }
 # }
 
 close FILE_RESULTS;
-close FILE_OUT;
-# close FILE_DAT;
 
+open FILE_OUT, ">", $file_out or
+    die "[ERROR] Unable to open >$file_out";
+print FILE_OUT $string_out;
+close FILE_OUT;
+
+# close FILE_DAT;
 
 print "Done processing $file_out\n";
