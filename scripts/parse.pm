@@ -131,7 +131,7 @@ foreach $event (sort keys %event_hash){
         }
     }
     else {
-        print "\n[ERROR] Unexpected event format:\n\"$event\"\n";
+        print "\n[ERROR] Unexpected event format:\n\"$event\"\n\n";
         usage_event_format and
             die "Event processing failed to match known template\n  ";
     }
@@ -193,7 +193,7 @@ foreach $event (sort keys %event_hash){
                     }
                     else {
                         print "\n[ERROR] Unexpected skater format:\n";
-                        print "\"@{$event_hash{$event}}[$i]\"\n";
+                        print "\"@{$event_hash{$event}}[$i]\"\n\n";
                         usage_skater_format and
                             die "Skater placement failed to match template\n  ";
                     }
@@ -282,7 +282,7 @@ foreach $event (sort keys %event_hash){
         }
         else {
             print "\n[ERROR] Unexpected skater format:\n";
-            print "\"@{$event_hash{$event}}[$i]\"\n";
+            print "\"@{$event_hash{$event}}[$i]\"\n\n";
             usage_skater_format and
                 die "Skater placement failed to match template\n  ";
         }
@@ -361,7 +361,7 @@ foreach $event_name (sort keys %event_hash){
             $points = $4;
         }
         else {
-            print "\n[ERROR] Unexpected skater format:\n\"$_\"\n";
+            print "\n[ERROR] Unexpected skater format:\n\"$_\"\n\n";
             usage_skater_format and
                 die "Skater placement failed to match template\n  ";
         }
