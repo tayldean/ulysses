@@ -22,7 +22,7 @@ HTML_NEWEST = $(addsuffix .html,$(addprefix $(DIR_BUILD)/,\
 
 vpath %.results $(DIR_RESULTS)
 
-all: $(HTMLS)
+all: $(HTMLS) $(DIR_BUILD)/index.html
 
 $(DIR_BUILD)/%.scores: %.results
 	$(PARSE) $< $@
