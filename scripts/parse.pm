@@ -48,8 +48,10 @@ $file_tex = $file_results;
 $file_tex = s/^results/latex/;
 $file_tex = s/results$/tex/;
 
-open FILE_RESULTS, "<", $file_results or die "Unable to open <$file_results";
-open FILE_OUT, ">", $file_out or die "Unable to open >$file_out";
+open FILE_RESULTS, "<", $file_results or
+    die "[ERROR] Unable to open <$file_results";
+open FILE_OUT, ">", $file_out or
+    die "[ERROR] Unable to open >$file_out";
 # open FILE_DAT, ">", $file_dat or die "Unable to open >$file_dat";
 
 while (<FILE_RESULTS>) {
@@ -84,7 +86,7 @@ foreach $event (sort keys %event_hash){
         }
     }
     else {
-        die "Unexpected event format:\n $event";
+        die "[ERROR] Unexpected event format:\n $event";
     }
     $num_skaters = 0;
     # compute number of skaters
@@ -143,7 +145,7 @@ foreach $event (sort keys %event_hash){
                         $school = $3;
                     }
                     else {
-                        die "Unexpected skater placement format:\n",
+                        die "[ERROR] Unexpected skater placement format:\n",
                         @{$event_hash{$event}}[$i];
                     }
                     $skater_start_hash{$skater} += 1;
@@ -230,7 +232,7 @@ foreach $event (sort keys %event_hash){
             $school = $3;
         }
         else {
-            die "Unexpected skater placement format:\n",
+            die "[ERROR] Unexpected skater placement format:\n",
             @{$event_hash{$event}}[$i];
         }
         if ($event_type =~ m/Dance/) {
@@ -308,7 +310,7 @@ foreach $event_name (sort keys %event_hash){
             $points = $4;
         }
         else {
-            die "Unexpected format for skater:\n  $_";
+            die "[ERROR] Unexpected format for skater:\n  $_";
         }
         $total_hash{$school} += $points;
         $total_starts_hash{$school} += 1;
