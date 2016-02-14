@@ -230,7 +230,8 @@ foreach $event (sort keys %event_hash){
             $school = $3;
         }
         else {
-            die "Unexpected skater format:\n $skater";
+            die "Unexpected skater placement format:\n",
+            @{$event_hash{$event}}[$i];
         }
         if ($event_type =~ m/Dance/) {
             $level_num = $level_hash_dance{$level};
