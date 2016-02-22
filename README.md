@@ -17,7 +17,7 @@ brew install git
 
 Login to GitHub or [create a GitHub account](https://github.com/join?source=header-home)
 
-Fork a copy of this repository by clicking "Fork" in the top right on using [this link](https://github.com/seldridge/ulysses#fork-destination-box)
+Fork a copy of this repository by clicking "Fork" in the top right or using [this link](https://github.com/seldridge/ulysses#fork-destination-box)
 
 Grab a local copy of your forked version of this repository. You will need to use your GitHub username, which I will indicate as `<USERNAME>`:
 
